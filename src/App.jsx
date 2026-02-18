@@ -1,0 +1,38 @@
+import React from 'react';
+import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
+import Navigation from './components/Navigation';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import { Toaster } from './components/ui/toaster';
+import { LanguageProvider } from './context/LanguageContext';
+
+function App() {
+  return (
+    <LanguageProvider>
+      <Router>
+        <ScrollToTop />
+        <div className="flex flex-col min-h-screen">
+          <Navigation />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/:productId" element={<ProductDetailPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Routes>
+          </main>
+          <Footer />
+          <Toaster />
+        </div>
+      </Router>
+    </LanguageProvider>
+  );
+}
+
+export default App;
