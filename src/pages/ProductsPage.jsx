@@ -1,13 +1,36 @@
-import React from 'react';
-import { Helmet } from 'react-helmet';
-import ProductCard from '@/components/ProductCard';
-import SectionTitle from '@/components/SectionTitle';
-import CallToAction from '@/components/CallToAction';
-import { useLanguage } from '@/context/LanguageContext';
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+
+import ProductCard from "@/components/ProductCard";
+import SectionTitle from "@/components/SectionTitle";
+import CallToAction from "@/components/CallToAction";
+
+import { useLanguage } from "@/context/LanguageContext";
+import { fetchProducts } from "@/api/productsApi";
 
 const ProductsPage = () => {
-  const { t } = useLanguage();
-  const products = t.products;
+  const { t, language } = useLanguage();
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Load products from backend
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        setLoading(true);
+
+        const data = await fetchProducts(language);
+        setProducts(data);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, [language]);
 
   return (
     <>
@@ -24,18 +47,30 @@ const ProductsPage = () => {
               <>
                 {t.productsPage.sectionSubtitle}
                 <br />
-                <span className="block mt-2 text-primary font-medium">{t.productsPage.customPricingIntro}</span>
+                <span className="block mt-2 text-primary font-medium">
+                  {t.productsPage.customPricingIntro}
+                </span>
               </>
             }
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {/* ✅ Loading state */}
+          {loading && (
+            <p className="text-center text-gray-500 mt-10">
+              Loading products...
+            </p>
+          )}
+
+          {/* ✅ Products grid */}
+          {!loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+              {products.map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
+            </div>
+          )}
         </div>
-        
+
         <CallToAction />
       </div>
     </>
