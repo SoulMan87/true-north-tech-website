@@ -39,3 +39,6 @@ target/
 # ============================
 .DS_Store
 Thumbs.db
+# Editor / LSP files
+.lsp/
+.clj-kondo/
