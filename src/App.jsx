@@ -22,7 +22,8 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/:productId" element={<ProductDetailPage />} />
+               {/* ✅ FIX */}
+              <Route path="/products/:slug" element={<ProductDetailPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
             </Routes>

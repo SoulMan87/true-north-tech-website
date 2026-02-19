@@ -1,27 +1,78 @@
-import React from 'react';
-import { Helmet } from 'react-helmet';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Star, Check, ArrowLeft, Shield, Zap, Layout, Globe, Tag } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import SectionTitle from '@/components/SectionTitle';
-import { useLanguage } from '@/context/LanguageContext';
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useParams, useNavigate } from "react-router-dom";
+
+import {
+  Star,
+  Check,
+  ArrowLeft,
+  Shield,
+  Zap,
+  Layout,
+  Globe,
+  Tag,
+} from "lucide-react";
+
+import { motion } from "framer-motion";
+import { useToast } from "@/components/ui/use-toast";
+import SectionTitle from "@/components/SectionTitle";
+
+import { useLanguage } from "@/context/LanguageContext";
+import { fetchProductDetail } from "@/api/productsApi";
+import { resolveProductImage } from "@/utils/productImages";
 
 const ProductDetailPage = () => {
-  const { productId } = useParams();
+  const { slug } = useParams(); // ✅ slug from URL
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  const product = t.products.find(p => p.id === productId);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // ✅ Load from backend instead of translations
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        setLoading(true);
+
+        const data = await fetchProductDetail(slug, language);
+
+        // ✅ Keep same structure as before
+        setProduct({
+          ...data,
+          image: resolveProductImage(data.imageUrl),
+        });
+      } catch (err) {
+        console.error("Error loading product:", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProduct();
+  }, [slug, language]);
+
+  // ✅ Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        {t.common.loading}
+      </div>
+    );
+  }
+
+  // ✅ Not found state (same design style)
   if (!product) {
     return (
       <div className="min-h-screen bg-light pt-32 pb-16 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-dark mb-4">{t.productDetail.productNotFound}</h2>
+          <h2 className="text-3xl font-bold text-dark mb-4">
+            {t.productDetail.productNotFound}
+          </h2>
           <button
-            onClick={() => navigate('/products')}
+            onClick={() => navigate("/products")}
             className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors duration-300"
           >
             {t.productDetail.backToSolutions}
@@ -31,6 +82,7 @@ const ProductDetailPage = () => {
     );
   }
 
+  // ✅ Same toast action
   const handleRequestDemo = () => {
     toast({
       title: t.productDetail.demoRequested,
@@ -46,16 +98,22 @@ const ProductDetailPage = () => {
       </Helmet>
 
       <div className="min-h-screen bg-light pt-28 pb-16">
-        {/* Product Hero */}
+
+        {/* Product Hero (UNCHANGED DESIGN) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-          <button 
-            onClick={() => navigate('/products')}
+
+          {/* Back Button stays exactly where it was */}
+          <button
+            onClick={() => navigate("/products")}
             className="flex items-center text-gray-500 hover:text-primary mb-8 transition-colors"
           >
-            <ArrowLeft size={20} className="mr-2" /> {t.productDetail.backToSolutions}
+            <ArrowLeft size={20} className="mr-2" />
+            {t.productDetail.backToSolutions}
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left Side */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -65,25 +123,35 @@ const ProductDetailPage = () => {
                 <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-semibold">
                   {product.name}
                 </div>
+
                 <div className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">
                   <Tag size={12} className="mr-1" />
                   {t.common.customPricing}
                 </div>
               </div>
-              
-              <h1 className="text-4xl md:text-5xl font-bold text-dark mb-6 leading-tight">{product.tagline}</h1>
-              <p className="text-xl text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+
+              <h1 className="text-4xl md:text-5xl font-bold text-dark mb-6 leading-tight">
+                {product.tagline}
+              </h1>
+
+              <p className="text-xl text-gray-600 mb-6 leading-relaxed">
+                {product.description}
+              </p>
+
               <p className="text-sm text-gray-500 mb-8 italic border-l-4 border-primary/30 pl-4 py-1">
                 {t.common.customPricingDesc}
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <button
-                  onClick={() => navigate(`/contact?product=${encodeURIComponent(product.name)}`)}
+                  onClick={() =>
+                    navigate(`/contact?product=${encodeURIComponent(product.name)}`)
+                  }
                   className="bg-primary text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/25 hover:-translate-y-1"
                 >
                   {t.common.requestQuote}
                 </button>
+
                 <button
                   onClick={handleRequestDemo}
                   className="bg-white border-2 border-gray-200 text-dark px-8 py-4 rounded-xl text-lg font-bold hover:border-primary hover:text-primary transition-all duration-300"
@@ -94,11 +162,14 @@ const ProductDetailPage = () => {
 
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <Star className="text-yellow-400 fill-yellow-400" size={18} />
-                <span className="font-bold text-dark">{product.rating}/5.0</span>
+                <span className="font-bold text-dark">
+                  {product.rating}/5.0
+                </span>
                 <span>{t.productDetail.customerRating}</span>
               </div>
             </motion.div>
 
+            {/* Right Side Image */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -115,51 +186,78 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Detailed Info */}
+        {/* Overview Section */}
         <section className="bg-white py-20 border-y border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-               <div className="lg:col-span-2">
-                 <h2 className="text-3xl font-bold text-dark mb-6">{t.productDetail.overview}</h2>
-                 {product.fullDescription.split('\n\n').map((para, i) => (
-                   <p key={i} className="text-lg text-gray-600 mb-6 leading-relaxed">
-                     {para}
-                   </p>
-                 ))}
-               </div>
-               
-               <div className="bg-light p-8 rounded-2xl border border-gray-200">
-                 <h3 className="text-xl font-bold text-dark mb-6">{t.productDetail.keyBenefits}</h3>
-                 <ul className="space-y-4">
-                   <li className="flex items-start">
-                     <Shield className="text-primary mt-1 mr-3 shrink-0" size={20} />
-                     <span className="text-gray-700">{t.productDetail.benefits.security}</span>
-                   </li>
-                   <li className="flex items-start">
-                     <Zap className="text-primary mt-1 mr-3 shrink-0" size={20} />
-                     <span className="text-gray-700">{t.productDetail.benefits.uptime}</span>
-                   </li>
-                   <li className="flex items-start">
-                     <Layout className="text-primary mt-1 mr-3 shrink-0" size={20} />
-                     <span className="text-gray-700">{t.productDetail.benefits.interface}</span>
-                   </li>
-                   <li className="flex items-start">
-                     <Globe className="text-primary mt-1 mr-3 shrink-0" size={20} />
-                     <span className="text-gray-700">{t.productDetail.benefits.support}</span>
-                   </li>
-                 </ul>
-               </div>
-             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+              <div className="lg:col-span-2">
+                <h2 className="text-3xl font-bold text-dark mb-6">
+                  {t.productDetail.overview}
+                </h2>
+
+                {/* Backend fullDescription */}
+                {product.fullDescription?.split("\n\n").map((para, i) => (
+                  <p
+                    key={i}
+                    className="text-lg text-gray-600 mb-6 leading-relaxed"
+                  >
+                    {para}
+                  </p>
+                ))}
+              </div>
+
+              {/* Benefits */}
+              <div className="bg-light p-8 rounded-2xl border border-gray-200">
+                <h3 className="text-xl font-bold text-dark mb-6">
+                  {t.productDetail.keyBenefits}
+                </h3>
+
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <Shield className="text-primary mt-1 mr-3 shrink-0" size={20} />
+                    <span className="text-gray-700">
+                      {t.productDetail.benefits.security}
+                    </span>
+                  </li>
+
+                  <li className="flex items-start">
+                    <Zap className="text-primary mt-1 mr-3 shrink-0" size={20} />
+                    <span className="text-gray-700">
+                      {t.productDetail.benefits.uptime}
+                    </span>
+                  </li>
+
+                  <li className="flex items-start">
+                    <Layout className="text-primary mt-1 mr-3 shrink-0" size={20} />
+                    <span className="text-gray-700">
+                      {t.productDetail.benefits.interface}
+                    </span>
+                  </li>
+
+                  <li className="flex items-start">
+                    <Globe className="text-primary mt-1 mr-3 shrink-0" size={20} />
+                    <span className="text-gray-700">
+                      {t.productDetail.benefits.support}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* Features */}
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionTitle title={t.productDetail.powerfulFeatures} subtitle={t.productDetail.featuresSubtitle} />
-            
+            <SectionTitle
+              title={t.productDetail.powerfulFeatures}
+              subtitle={t.productDetail.featuresSubtitle}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {product.features.map((feature, index) => (
+              {product.features?.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -169,34 +267,53 @@ const ProductDetailPage = () => {
                   className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg hover:border-primary/30 transition-all"
                 >
                   <Check className="text-accent mb-4" size={24} />
-                  <h4 className="font-semibold text-dark">{feature}</h4>
+                  <h4 className="font-semibold text-dark">
+                    {feature.text || feature}
+                  </h4>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="bg-dark py-20 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold mb-12 text-center">{t.productDetail.trustedBy}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {product.testimonials.map((testimonial, i) => (
-                <div key={i} className="bg-white/5 p-8 rounded-2xl border border-white/10">
-                  <div className="flex text-yellow-400 mb-4">
-                    {[...Array(5)].map((_, k) => <Star key={k} size={16} fill="currentColor" />)}
-                  </div>
-                  <p className="text-xl text-gray-300 italic mb-6">"{testimonial.text}"</p>
-                  <div>
-                    <p className="font-bold text-white">{testimonial.name}</p>
-                    <p className="text-sm text-gray-400">{testimonial.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Testimonials (optional if backend has them) */}
+        {product.testimonials?.length > 0 && (
+          <section className="bg-dark py-20 text-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-bold mb-12 text-center">
+                {t.productDetail.trustedBy}
+              </h2>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {product.testimonials.map((testimonial, i) => (
+                  <div
+                    key={i}
+                    className="bg-white/5 p-8 rounded-2xl border border-white/10"
+                  >
+                    <div className="flex text-yellow-400 mb-4">
+                      {[...Array(5)].map((_, k) => (
+                        <Star key={k} size={16} fill="currentColor" />
+                      ))}
+                    </div>
+
+                    <p className="text-xl text-gray-300 italic mb-6">
+                      "{testimonial.text}"
+                    </p>
+
+                    <div>
+                      <p className="font-bold text-white">
+                        {testimonial.name}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </>
   );

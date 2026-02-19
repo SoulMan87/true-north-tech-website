@@ -7,6 +7,7 @@ import CallToAction from "@/components/CallToAction";
 
 import { useLanguage } from "@/context/LanguageContext";
 import { fetchProducts } from "@/api/productsApi";
+import { resolveProductImage } from "@/utils/productImages";
 
 const ProductsPage = () => {
   const { t, language } = useLanguage();
@@ -65,8 +66,14 @@ const ProductsPage = () => {
           {!loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
               {products.map((product) => (
-                <ProductCard key={product.slug} product={product} />
-              ))}
+              <ProductCard
+                key={product.slug}
+                 product={{
+                 ...product,
+                 image: resolveProductImage(product.imageUrl),
+                }}
+             />
+           ))}
             </div>
           )}
         </div>
