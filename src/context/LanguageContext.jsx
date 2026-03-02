@@ -5,9 +5,50 @@ import driverImg from "@/assets/driver-saas.jpg";
 import hotelManagementSystem from "@/assets/hotel-management-system.jpg";
 import customSoftwareServices from "@/assets/custom-software-services.jpg";
 import funeralManagementImg from "@/assets/funeral-management.jpg";
+import { getCookie, setCookie } from "@/utils/cookies";
 
 
 const LanguageContext = createContext();
+
+const LANGUAGE_COOKIE = "language";
+const SPANISH_COUNTRY_CODES = new Set([
+  "AR",
+  "BO",
+  "CL",
+  "CO",
+  "CR",
+  "CU",
+  "DO",
+  "EC",
+  "ES",
+  "GQ",
+  "GT",
+  "HN",
+  "MX",
+  "NI",
+  "PA",
+  "PE",
+  "PR",
+  "PY",
+  "SV",
+  "UY",
+  "VE",
+]);
+
+const normalizeLanguage = (value) => {
+  if (value === "en" || value === "es") return value;
+  return null;
+};
+
+const readStoredLanguage = () => {
+  const cookieValue = normalizeLanguage(getCookie(LANGUAGE_COOKIE));
+  if (cookieValue) return cookieValue;
+  try {
+    return normalizeLanguage(localStorage.getItem("language"));
+  } catch (error) {
+    return null;
+  }
+};
 
 const translations = {
   en: {
@@ -34,6 +75,14 @@ const translations = {
       about: "About Us",
       contact: "Contact",
       getStarted: "Get Started"
+    },
+    cookies: {
+      title: "We use cookies",
+      message: "We use cookies to improve your experience and understand how you use our site.",
+      learnMore: "Learn more",
+      acceptAll: "Accept all",
+      acceptNecessary: "Only necessary",
+      acceptNone: "Reject all"
     },
     footer: {
       description: "We are a premier software production company delivering scalable, innovative solutions that drive digital transformation for businesses worldwide. Not just an agency—we are your technology partner.",
@@ -350,6 +399,14 @@ const translations = {
       contact: "Contacto",
       getStarted: "Empezar"
     },
+    cookies: {
+      title: "Usamos cookies",
+      message: "Usamos cookies para mejorar tu experiencia y entender cómo utilizas nuestro sitio.",
+      learnMore: "Saber más",
+      acceptAll: "Aceptar todas",
+      acceptNecessary: "Solo necesarias",
+      acceptNone: "Rechazar todas"
+    },
     footer: {
       description: "Somos una empresa líder en producción de software que ofrece soluciones escalables e innovadoras para impulsar la transformación digital de empresas en todo el mundo. No solo una agencia, somos su socio tecnológico.",
       solutions: "Soluciones",
@@ -644,12 +701,43 @@ const translations = {
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('language') || 'es';
+    return readStoredLanguage() || "es";
   });
 
   useEffect(() => {
-    localStorage.setItem('language', language);
+    setCookie(LANGUAGE_COOKIE, language, { days: 365, sameSite: "Lax" });
+    try {
+      localStorage.setItem("language", language);
+    } catch (error) {
+      // Ignore storage errors (private mode, blocked storage, etc.)
+    }
   }, [language]);
+
+  useEffect(() => {
+    const stored = readStoredLanguage();
+    if (stored) return;
+
+    let cancelled = false;
+
+    const detectLanguage = async () => {
+      try {
+        const response = await fetch("https://ipapi.co/json/");
+        if (!response.ok) throw new Error("Geo lookup failed");
+        const data = await response.json();
+        const countryCode = (data?.country_code || "").toUpperCase();
+        const detected = SPANISH_COUNTRY_CODES.has(countryCode) ? "es" : "en";
+        if (!cancelled) setLanguage(detected);
+      } catch (error) {
+        // Keep current language if detection fails
+      }
+    };
+
+    detectLanguage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = {
     language,

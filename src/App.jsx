@@ -12,6 +12,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import { Toaster } from './components/ui/toaster';
 import { LanguageProvider } from './context/LanguageContext';
+import CookieConsent from './components/CookieConsent';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <CookieConsent />
           <Toaster />
         </div>
       </Router>
