@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { motion } from "framer-motion";
-import { useToast } from "@/components/ui/use-toast";
 import SectionTitle from "@/components/SectionTitle";
 
 import { useLanguage } from "@/context/LanguageContext";
@@ -24,7 +23,6 @@ import { resolveProductImage } from "@/utils/productImages";
 const ProductDetailPage = () => {
   const { slug } = useParams(); // ✅ slug from URL
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { t, language } = useLanguage();
 
   const [product, setProduct] = useState(null);
@@ -66,7 +64,7 @@ const ProductDetailPage = () => {
   // ✅ Not found state (same design style)
   if (!product) {
     return (
-      <div className="min-h-screen bg-light pt-32 pb-16 flex items-center justify-center">
+      <div className="min-h-screen bg-light pt-32 pb-0 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-dark mb-4">
             {t.productDetail.productNotFound}
@@ -82,14 +80,6 @@ const ProductDetailPage = () => {
     );
   }
 
-  // ✅ Same toast action
-  const handleRequestDemo = () => {
-    toast({
-      title: t.productDetail.demoRequested,
-      description: t.productDetail.demoRequestedDesc,
-    });
-  };
-
   return (
     <>
       <Helmet>
@@ -97,7 +87,7 @@ const ProductDetailPage = () => {
         <meta name="description" content={product.description} />
       </Helmet>
 
-      <div className="min-h-screen bg-light pt-28 pb-16">
+      <div className="min-h-screen bg-light pt-28 pb-0">
 
         {/* Product Hero (UNCHANGED DESIGN) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
@@ -142,7 +132,7 @@ const ProductDetailPage = () => {
                 {t.common.customPricingDesc}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex justify-center mb-8">
                 <button
                   onClick={() =>
                     navigate(`/contact?product=${encodeURIComponent(product.name)}`)
@@ -150,13 +140,6 @@ const ProductDetailPage = () => {
                   className="bg-primary text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg shadow-primary/25 hover:-translate-y-1"
                 >
                   {t.common.requestQuote}
-                </button>
-
-                <button
-                  onClick={handleRequestDemo}
-                  className="bg-white border-2 border-gray-200 text-dark px-8 py-4 rounded-xl text-lg font-bold hover:border-primary hover:text-primary transition-all duration-300"
-                >
-                  {t.common.requestDemo}
                 </button>
               </div>
 
