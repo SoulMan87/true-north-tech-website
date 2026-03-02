@@ -1,11 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 import CompassLogo from './CompassLogo';
 import { useLanguage } from '@/context/LanguageContext';
 
 const Footer = () => {
   const { t } = useLanguage();
+  const location = useLocation();
+  const isActivePath = (path) => {
+    if (path === "/products") {
+      return location.pathname === "/products" || location.pathname === "/products/";
+    }
+    return location.pathname === path;
+  };
+  const isCurrentPath = (path) =>
+    location.pathname === path || location.pathname === `${path}/`;
 
   const quickLinks = [
     { name: t.navigation.home, path: '/' },
@@ -59,13 +68,23 @@ const Footer = () => {
             <ul className="space-y-3">
               {products.map((link) => (
                 <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className="text-gray-400 hover:text-accent transition-colors duration-300 text-sm flex items-center group"
-                  >
-                    <ArrowRight size={14} className="mr-2 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
-                    {link.name}
-                  </Link>
+                  {isCurrentPath(link.path) ? (
+                    <span
+                      className="text-gray-500 text-sm flex items-center cursor-not-allowed opacity-60"
+                      aria-disabled="true"
+                    >
+                      <ArrowRight size={14} className="mr-2 opacity-40" />
+                      {link.name}
+                    </span>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className="text-gray-400 hover:text-accent transition-colors duration-300 text-sm flex items-center group"
+                    >
+                      <ArrowRight size={14} className="mr-2 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -76,13 +95,23 @@ const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className="text-gray-400 hover:text-accent transition-colors duration-300 text-sm flex items-center group"
-                  >
-                    <ArrowRight size={14} className="mr-2 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
-                    {link.name}
-                  </Link>
+                  {isActivePath(link.path) ? (
+                    <span
+                      className="text-gray-500 text-sm flex items-center cursor-not-allowed opacity-60"
+                      aria-disabled="true"
+                    >
+                      <ArrowRight size={14} className="mr-2 opacity-40" />
+                      {link.name}
+                    </span>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className="text-gray-400 hover:text-accent transition-colors duration-300 text-sm flex items-center group"
+                    >
+                      <ArrowRight size={14} className="mr-2 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

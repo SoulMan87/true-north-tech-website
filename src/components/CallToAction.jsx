@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const CallToAction = () => {
+const CallToAction = ({ disableExplore = false }) => {
   const navigate = useNavigate();
 
   return (
@@ -33,8 +33,15 @@ const CallToAction = () => {
               Get Started Now <ArrowRight size={20} className="ml-2" />
             </button>
             <button
-              onClick={() => navigate('/products')}
-              className="bg-transparent border border-white/20 hover:bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300"
+              onClick={() => {
+                if (!disableExplore) navigate('/products');
+              }}
+              disabled={disableExplore}
+              className={`bg-transparent border border-white/20 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 ${
+                disableExplore
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-white/10'
+              }`}
             >
               Explore Products
             </button>
