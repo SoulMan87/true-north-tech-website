@@ -156,8 +156,12 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} True North Tech. {t.common.allRightsReserved}
           </p>
           <div className="flex justify-center space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">{t.common.privacyPolicy}</a>
-            <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">{t.common.termsOfService}</a>
+            <Link to="/privacy-policy" className="text-gray-500 hover:text-white text-sm transition-colors">
+              {t.common.privacyPolicy}
+            </Link>
+            <Link to="/terms-of-service" className="text-gray-500 hover:text-white text-sm transition-colors">
+              {t.common.termsOfService}
+            </Link>
           </div>
         </div>
       </div>
