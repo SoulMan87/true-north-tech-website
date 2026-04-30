@@ -1,6 +1,6 @@
 // src/api/productsApi.js
 
-const BASE_URL = "http://localhost:8080/api/products";
+const BASE_URL = "https://contact-lastest.onrender.com/api/products";
 
 /**
  * GET /api/products?lang=en
