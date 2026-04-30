@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
+import { Route, Routes, HashRouter as Router } from 'react-router-dom'; // ← Solo cambia esta línea
 import ScrollToTop from './components/ScrollToTop';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
