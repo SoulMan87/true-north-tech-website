@@ -1,9 +1,33 @@
-# .htaccess file for React Router
+# Solución para MIME types en Hostinger
+AddType application/javascript .js
+AddType text/javascript .mjs
+AddType application/wasm .wasm
+
+# Forzar Content-Type correcto para JS
+<FilesMatch "\.(js|mjs)$">
+  Header set Content-Type "application/javascript"
+  Header set Content-Encoding "identity"
+</FilesMatch>
+
+# Para React Router (SPA)
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Si el archivo existe, sírvelo
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+
+  # Si es directorio, sírvelo
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Todo lo demás a index.html
   RewriteRule . /index.html [L]
+</IfModule>
+
+# Deshabilitar mod_deflate para JS (puede causar problemas)
+<IfModule mod_deflate.c>
+  RemoveType .js .mjs
+  AddType application/javascript .js .mjs
 </IfModule>
