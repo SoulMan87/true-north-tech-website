@@ -6,6 +6,12 @@ import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import SectionTitle from '@/components/SectionTitle';
 import { useLanguage } from '@/context/LanguageContext';
+import { MultipleSchemas } from '@/components/StructuredData';
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+  getLocalBusinessSchema,
+} from '@/utils/seoMetadata';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,6 +20,13 @@ const ContactPage = () => {
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const seoConfig = getPageSEOConfig('contact');
+
+  const schemas = [
+    getOrganizationSchema(),
+    getLocalBusinessSchema(),
+  ];
   
   const [formData, setFormData] = useState({
     name: '',
@@ -167,10 +180,22 @@ const ContactPage = () => {
   ];
 
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>{t.contact.title}</title>
-        <meta name="description" content={t.contact.pageSubtitle} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content="contact software company, get in touch, software development inquiry, request demo, request quote" />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={seoConfig.image} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
+        <meta name="twitter:image" content={seoConfig.image} />
       </Helmet>
 
       <div className="min-h-screen bg-light pt-32 pb-20">
@@ -385,7 +410,7 @@ const ContactPage = () => {
           </div>
         </div>
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 
