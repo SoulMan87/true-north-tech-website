@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 import SectionTitle from "@/components/SectionTitle";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { fetchProductDetail } from "@/api/productsApi";
+import { fetchProductDetail } from "@/services/productsService";
 import { resolveProductImage } from "@/utils/productImages";
 
 const ProductDetailPage = () => {
@@ -30,26 +30,36 @@ const ProductDetailPage = () => {
 
   // ✅ Load from backend instead of translations
   useEffect(() => {
+    let active = true;
+
     async function loadProduct() {
       try {
         setLoading(true);
 
         const data = await fetchProductDetail(slug, language);
+        if (!active) return;
 
-        // ✅ Keep same structure as before
         setProduct({
           ...data,
-          image: resolveProductImage(data.imageUrl),
+          image: data.image || resolveProductImage(data.imageUrl),
+          slug: data.slug || data.id,
         });
       } catch (err) {
-        console.error("Error loading product:", err);
-        setProduct(null);
+        if (active) {
+          console.error("Error loading product:", err);
+          setProduct(null);
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     loadProduct();
+    return () => {
+      active = false;
+    };
   }, [slug, language]);
 
   // ✅ Loading state

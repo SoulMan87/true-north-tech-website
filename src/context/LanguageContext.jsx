@@ -50,7 +50,7 @@ const readStoredLanguage = () => {
   }
 };
 
-const translations = {
+export const translations = {
   en: {
     common: {
       getStarted: "Get Started",

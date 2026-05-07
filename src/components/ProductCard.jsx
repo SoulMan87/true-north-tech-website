@@ -54,7 +54,7 @@ const ProductCard = ({ product }) => {
               {t.common.requestQuote}
             </button>
             <button 
-              onClick={() => navigate(`/products/${product.slug}`)}
+              onClick={() => navigate(`/products/${product.slug || product.id}`)}
               className="text-primary font-semibold text-sm flex items-center hover:text-secondary transition-colors"
             >
               {t.common.viewDetails} <ArrowRight size={16} className="ml-2" />

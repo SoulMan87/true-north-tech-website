@@ -6,7 +6,7 @@ import SectionTitle from "@/components/SectionTitle";
 import CallToAction from "@/components/CallToAction";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { fetchProducts } from "@/api/productsApi";
+import { fetchProducts } from "@/services/productsService";
 import { resolveProductImage } from "@/utils/productImages";
 
 const ProductsPage = () => {
@@ -17,20 +17,37 @@ const ProductsPage = () => {
 
   // ✅ Load products from backend
   useEffect(() => {
+    let active = true;
+
     async function loadProducts() {
       try {
         setLoading(true);
 
         const data = await fetchProducts(language);
-        setProducts(data);
+        if (!active) return;
+
+        setProducts(
+          data.map((product) => ({
+            ...product,
+            image: product.image || resolveProductImage(product.imageUrl),
+            slug: product.slug || product.id,
+          }))
+        );
       } catch (error) {
-        console.error("Error loading products:", error);
+        if (active) {
+          console.error("Error loading products:", error);
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     loadProducts();
+    return () => {
+      active = false;
+    };
   }, [language]);
 
   return (
@@ -66,14 +83,15 @@ const ProductsPage = () => {
           {!loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {products.map((product) => (
-              <ProductCard
-                key={product.slug}
-                 product={{
-                 ...product,
-                 image: resolveProductImage(product.imageUrl),
-                }}
-             />
-           ))}
+                <ProductCard
+                  key={product.slug || product.id}
+                  product={{
+                    ...product,
+                    image: product.image || resolveProductImage(product.imageUrl),
+                    slug: product.slug || product.id,
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
