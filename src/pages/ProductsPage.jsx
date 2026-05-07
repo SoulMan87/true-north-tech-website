@@ -8,12 +8,25 @@ import CallToAction from "@/components/CallToAction";
 import { useLanguage } from "@/context/LanguageContext";
 import { fetchProducts } from "@/services/productsService";
 import { resolveProductImage } from "@/utils/productImages";
+import { MultipleSchemas } from "@/components/StructuredData";
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+  getWebsiteSchema,
+} from "@/utils/seoMetadata";
 
 const ProductsPage = () => {
   const { t, language } = useLanguage();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const seoConfig = getPageSEOConfig('products');
+
+  const schemas = [
+    getOrganizationSchema(),
+    getWebsiteSchema(),
+  ];
 
   // ✅ Load products from backend
   useEffect(() => {
@@ -51,10 +64,22 @@ const ProductsPage = () => {
   }, [language]);
 
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>{t.productsPage.title}</title>
-        <meta name="description" content={t.productsPage.sectionSubtitle} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content="software solutions, restaurant KDS, hotel booking, fleet management, funeral management, real estate software, custom software development, enterprise software" />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={seoConfig.image} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
+        <meta name="twitter:image" content={seoConfig.image} />
       </Helmet>
 
       <div className="min-h-screen bg-light pt-28 pb-0">
@@ -98,7 +123,7 @@ const ProductsPage = () => {
 
         <CallToAction disableExplore={!loading} />
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 

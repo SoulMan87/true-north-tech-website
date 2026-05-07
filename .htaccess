@@ -1,33 +1,71 @@
-# Solución para MIME types en Hostinger
+# =========================================================
+# MIME TYPES
+# =========================================================
+
 AddType application/javascript .js
 AddType text/javascript .mjs
 AddType application/wasm .wasm
+AddType text/css .css
 
-# Forzar Content-Type correcto para JS
-<FilesMatch "\.(js|mjs)$">
-  Header set Content-Type "application/javascript"
-  Header set Content-Encoding "identity"
-</FilesMatch>
+# =========================================================
+# REACT / VITE SPA ROUTING
+# =========================================================
 
-# Para React Router (SPA)
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # Si el archivo existe, sírvelo
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteRule ^ - [L]
-
-  # Si es directorio, sírvelo
+  # No reescribir archivos físicos existentes
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Todo lo demás a index.html
-  RewriteRule . /index.html [L]
+  # Permitir assets generados por Vite
+  RewriteRule ^assets/ - [L]
+
+  # SPA fallback
+  RewriteRule ^ index.html [L]
 </IfModule>
 
-# Deshabilitar mod_deflate para JS (puede causar problemas)
-<IfModule mod_deflate.c>
-  RemoveType .js .mjs
-  AddType application/javascript .js .mjs
+# =========================================================
+# CACHE ESTÁTICO
+# =========================================================
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # CSS
+  ExpiresByType text/css "access plus 1 month"
+
+  # JavaScript
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+
+  # Images
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
+
+  # Fonts
+  ExpiresByType font/woff2 "access plus 1 month"
+  ExpiresByType font/woff "access plus 1 month"
 </IfModule>
+
+# =========================================================
+# BASIC SECURITY
+# =========================================================
+
+# Disable directory listing
+Options -Indexes
+
+# Block hidden files
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Prevent access to sensitive files
+<FilesMatch "(^#.*#|\.(env|log|config|json|lock))$">
+  Require all denied
+</FilesMatch>

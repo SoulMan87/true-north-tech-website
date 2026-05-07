@@ -19,6 +19,13 @@ import SectionTitle from "@/components/SectionTitle";
 import { useLanguage } from "@/context/LanguageContext";
 import { fetchProductDetail } from "@/services/productsService";
 import { resolveProductImage } from "@/utils/productImages";
+import { MultipleSchemas, BreadcrumbSchema } from "@/components/StructuredData";
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+  getSoftwareApplicationSchema,
+  getBreadcrumbSchema,
+} from "@/utils/seoMetadata";
 
 const ProductDetailPage = () => {
   const { slug } = useParams(); // ✅ slug from URL
@@ -90,11 +97,45 @@ const ProductDetailPage = () => {
     );
   }
 
+  // ✅ SEO Configuration for product detail page
+  const seoConfig = getPageSEOConfig('productDetail', {
+    name: product.name,
+    description: product.description,
+    slug: product.slug,
+  });
+
+  // ✅ Breadcrumb navigation for SEO
+  const breadcrumbs = [
+    { name: 'Home', url: '/' },
+    { name: 'Products', url: '/products' },
+    { name: product.name, url: `/products/${product.slug}` },
+  ];
+
+  // ✅ Schemas for rich results
+  const schemas = [
+    getOrganizationSchema(),
+    getSoftwareApplicationSchema(product),
+    getBreadcrumbSchema(breadcrumbs),
+  ];
+
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>{product.name} - True North Tech</title>
-        <meta name="description" content={product.description} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content={`${product.name}, ${product.category}, software solution, ${product.tagline}`} />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={product.image || seoConfig.image} />
+        <meta property="og:image:alt" content={product.name} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
+        <meta name="twitter:image" content={product.image || seoConfig.image} />
       </Helmet>
 
       <div className="min-h-screen bg-light pt-28 pb-0">
@@ -308,7 +349,7 @@ const ProductDetailPage = () => {
           </section>
         )}
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 

@@ -5,10 +5,25 @@ import { Code2, Globe2, Lightbulb, Users2, Rocket } from 'lucide-react';
 import SectionTitle from '@/components/SectionTitle';
 import FeatureCard from '@/components/FeatureCard';
 import { useLanguage } from '@/context/LanguageContext';
+import { MultipleSchemas } from '@/components/StructuredData';
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+  getWebsiteSchema,
+  getLocalBusinessSchema,
+} from '@/utils/seoMetadata';
 import techTean from '@/assets/tech-team.jpg';
 
 const AboutPage = () => {
   const { t } = useLanguage();
+
+  const seoConfig = getPageSEOConfig('about');
+
+  const schemas = [
+    getOrganizationSchema(),
+    getWebsiteSchema(),
+    getLocalBusinessSchema(),
+  ];
 
   const stats = [
     { label: t.about.yearsExcellence, value: '5+' },
@@ -36,10 +51,22 @@ const AboutPage = () => {
   ];
 
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>{t.about.title}</title>
-        <meta name="description" content={t.about.heroDesc} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content="software company, engineering excellence, digital transformation, enterprise solutions, software production, technology partner, Medellin Colombia" />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={seoConfig.image} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
+        <meta name="twitter:image" content={seoConfig.image} />
       </Helmet>
 
       <div className="min-h-screen bg-light">
@@ -149,7 +176,7 @@ const AboutPage = () => {
            </div>
         </section>
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 
