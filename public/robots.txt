@@ -1,0 +1,37 @@
+# robots.txt - True North Tech
+# https://www.truenorthtech.site/robots.txt
+
+# Allow all bots to crawl the entire site
+User-agent: *
+Allow: /
+
+# Disallow crawling of unnecessary paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.git/
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /build/
+Disallow: /dist/
+Disallow: *.map
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Yandex
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 2
+
+# Site speed - allow fast crawling for search engines
+Request-rate: 1 1s
+
+# Sitemap reference
+Sitemap: https://www.truenorthtech.site/sitemap.xml

@@ -6,11 +6,21 @@ import { ArrowRight, ShieldCheck, Zap, Globe, Cpu } from 'lucide-react';
 import FeatureCard from '@/components/FeatureCard';
 import CallToAction from '@/components/CallToAction';
 import { useLanguage } from '@/context/LanguageContext';
+import { MultipleSchemas } from '@/components/StructuredData';
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+  getWebsiteSchema,
+  getLocalBusinessSchema,
+  getServiceSchema,
+} from '@/utils/seoMetadata';
 import backGround from '@/assets/back-ground.jpg';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  const seoConfig = getPageSEOConfig('home');
 
   const features = [
     {
@@ -35,11 +45,33 @@ const HomePage = () => {
     }
   ];
 
+  const schemas = [
+    getOrganizationSchema(),
+    getWebsiteSchema(),
+    getLocalBusinessSchema(),
+    getServiceSchema(),
+  ];
+
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>True North Tech - {t.home.heroTitle}</title>
-        <meta name="description" content={t.home.heroDescription} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content={seoConfig.keywords} />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={seoConfig.image} />
+        <meta property="og:image:alt" content="True North Tech - Enterprise Software Development" />
+        <meta property="og:site_name" content="True North Tech" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
+        <meta name="twitter:image" content={seoConfig.image} />
+        <meta name="twitter:creator" content="@truenorthtech" />
       </Helmet>
 
       <div className="min-h-screen">
@@ -132,7 +164,7 @@ const HomePage = () => {
         {/* Call To Action */}
         <CallToAction />
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 

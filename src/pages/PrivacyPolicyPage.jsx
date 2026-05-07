@@ -2,11 +2,22 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import { useLanguage } from "@/context/LanguageContext";
 import { formatLegalDate, getQuarterlyUpdatedDate } from "@/utils/legalDate";
+import { MultipleSchemas } from "@/components/StructuredData";
+import {
+  getPageSEOConfig,
+  getOrganizationSchema,
+} from "@/utils/seoMetadata";
 
 const PrivacyPolicyPage = () => {
   const { language } = useLanguage();
   const isEs = language === "es";
   const lastUpdated = formatLegalDate(getQuarterlyUpdatedDate(), language);
+
+  const seoConfig = getPageSEOConfig('privacy');
+
+  const schemas = [
+    getOrganizationSchema(),
+  ];
 
   const content = isEs
     ? {
@@ -171,10 +182,21 @@ const PrivacyPolicyPage = () => {
       };
 
   return (
-    <>
+    <MultipleSchemas schemas={schemas}>
       <Helmet>
-        <title>{`${content.title} - True North Tech`}</title>
-        <meta name="description" content={content.subtitle} />
+        <title>{seoConfig.title}</title>
+        <meta name="description" content={seoConfig.description} />
+        <meta name="keywords" content="privacy policy, data protection, GDPR, personal information, data security" />
+        <link rel="canonical" href={seoConfig.url} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={seoConfig.url} />
+        <meta property="og:title" content={seoConfig.title} />
+        <meta property="og:description" content={seoConfig.description} />
+        <meta property="og:image" content={seoConfig.image} />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:url" content={seoConfig.url} />
+        <meta name="twitter:title" content={seoConfig.title} />
+        <meta name="twitter:description" content={seoConfig.description} />
       </Helmet>
 
       <div className="min-h-screen bg-light pb-16">
@@ -239,7 +261,7 @@ const PrivacyPolicyPage = () => {
           </div>
         </section>
       </div>
-    </>
+    </MultipleSchemas>
   );
 };
 
