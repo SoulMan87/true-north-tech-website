@@ -31,10 +31,10 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: Linkedin, url: '#', label: 'LinkedIn' },
-    { icon: Twitter, url: '#', label: 'Twitter' },
-    { icon: Facebook, url: '#', label: 'Facebook' },
-    { icon: Instagram, url: '#', label: 'Instagram' }
+    { icon: Linkedin, url: 'https://www.linkedin.com/company/true-north-tech-col/', label: 'LinkedIn' },
+    { icon: Facebook, url: 'https://www.facebook.com/share/1CbQLYPqQE/', label: 'Facebook' },
+    { icon: Twitter, url: 'https://x.com/TrueNorthTech25', label: 'X' },
+    { icon: Instagram, url: 'https://www.instagram.com/true_north_tech?igsh=MTNyeDVlNG4zdWM5Ng==', label: 'Instagram' }
   ];
 
   return (
@@ -53,6 +53,8 @@ const Footer = () => {
                   <a
                     key={social.label}
                     href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={social.label}
                     className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-primary hover:scale-110 transition-all duration-300 group"
                   >
